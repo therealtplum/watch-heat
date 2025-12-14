@@ -1,0 +1,36 @@
+# Environment variables
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Logs
+*.log
+watch_heat.log
+
+# Data and cache
+data/
+cache/
+*.csv
+*.html
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
