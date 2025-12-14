@@ -1,10 +1,26 @@
 # Watch Heat (Momentum Screener)
 
+> **A daily momentum screener for luxury watch market analysis** that identifies hot watch references by combining real-time market data, price momentum, supply/demand dynamics, and profit calculations to help traders make informed buying decisions.
+
 Daily screener for hot watch references (Rolex, Omega, Cartier, AP to start).
 - Pulls **WatchCharts API v3** for current market snap (per reference).
 - Pulls **eBay Browse API** counts as a demand proxy.
 - Computes Δ7/14/30d, Z90, supply/DOM deltas (when available), and a composite **Heat Score**.
 - Adds **Profit Overlay** with **Max Bid (8%)** and **Max Bid (10%)** based on fees/buffers.
+
+## About
+
+Watch Heat is a comprehensive momentum screener designed for luxury watch market analysis. It automates the process of identifying "hot" watch references by aggregating data from multiple sources, computing sophisticated momentum metrics, and providing actionable profit calculations.
+
+**Key Capabilities:**
+- **Real-time Market Data**: Pulls current market prices, active listings, and days-on-market metrics from WatchCharts API
+- **Demand Signals**: Tracks eBay activity as a proxy for market demand
+- **Momentum Analysis**: Calculates multi-timeframe price changes (7/14/30 days), rolling z-scores, and supply/demand deltas
+- **Composite Heat Score**: Weighted algorithm combining price momentum, market dynamics, and demand signals
+- **Profit Optimization**: Calculates maximum bid prices to achieve target margins (8-10%) after accounting for fees and costs
+- **Interactive Reports**: Beautiful, sortable HTML reports with filtering and search capabilities
+
+Perfect for watch traders, collectors, and market analysts who want to spot emerging trends and make data-driven buying decisions.
 
 ## Features
 
