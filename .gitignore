@@ -21,6 +21,7 @@ watch_heat.log
 data/
 cache/
 *.csv
+!universe.csv  # Track universe.csv as it's a config file
 *.html
 
 # IDE
