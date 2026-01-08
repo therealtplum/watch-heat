@@ -311,7 +311,7 @@ HTML_TMPL = """
       const text = cell.textContent.trim();
       if (text === '—' || text === '') return null;
       // Remove currency symbols and commas
-      const cleaned = text.replace(/[$,]/g, '').replace(/[^\d.\-+]/g, '');
+      const cleaned = text.replace(/[$,]/g, '').replace(/[^\\d.\\-+]/g, '');
       const num = parseFloat(cleaned);
       return isNaN(num) ? text : num;
     }

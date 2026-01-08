@@ -3,10 +3,10 @@
 > **A daily momentum screener for luxury watch market analysis** that identifies hot watch references by combining real-time market data, price momentum, supply/demand dynamics, and profit calculations to help traders make informed buying decisions.
 
 Daily screener for hot watch references (Rolex, Omega, Cartier, AP to start).
-- Pulls **WatchCharts API v3** for current market snap (per reference).
-- Pulls **eBay Browse API** counts as a demand proxy.
-- Computes Δ7/14/30d, Z90, supply/DOM deltas (when available), and a composite **Heat Score**.
-- Adds **Profit Overlay** with **Max Bid (8%)** and **Max Bid (10%)** based on fees/buffers.
+- Scrapes **Chrono24** for current market prices and listing counts (free alternative to WatchCharts API @ $1000/yr)
+- Pulls **eBay Browse API** counts as a demand proxy (optional, pending developer approval)
+- Computes Δ7/14/30d, Z90, supply deltas (when available), and a composite **Heat Score**
+- Adds **Profit Overlay** with **Max Bid (8%)** and **Max Bid (10%)** based on fees/buffers
 
 ## About
 
@@ -56,23 +56,26 @@ Options:
 
 ### API Setup
 
-#### WatchCharts API
-1. Sign up for WatchCharts Professional + API plan
-2. Get your API key from the dashboard
-3. Use `/v3/search/watch` to get `uuid`, then `/v3/watch/info` (send `x-api-key` header)
-4. Add to `.env`: `WATCHCHARTS_API_KEY=your_key_here`
+#### Chrono24 (Primary Data Source)
+No API key required! Data is scraped using Playwright browser automation.
 
-#### eBay Browse API
+> **Note:** Chrono24 has aggressive Cloudflare protection. The scraper uses:
+> - Fresh browser contexts per request
+> - User agent rotation
+> - 5-second delays between requests
+> - Retry logic with exponential backoff
+
+#### eBay Browse API (Optional - Demand Signal)
 1. Create an app at [eBay Developers](https://developer.ebay.com/)
-2. Get your App ID, Cert ID, and Dev ID
+2. Wait for developer approval (~1 day)
 3. Generate an OAuth token using client credentials flow
 4. Add to `.env`:
    ```
-   EBAY_APP_ID=your_app_id
-   EBAY_CERT_ID=your_cert_id
-   EBAY_DEV_ID=your_dev_id
    EBAY_OAUTH_TOKEN=your_oauth_token
    ```
+
+#### WatchCharts API (Not Used)
+WatchCharts API costs $1000/year. We use Chrono24 scraping as a free alternative.
 
 ## Project Structure
 
@@ -83,9 +86,10 @@ watch-heat/
 ├── universe.csv            # Watch references to track
 ├── requirements.txt        # Python dependencies
 ├── data_sources/
-│   ├── watchcharts.py      # WatchCharts API client
-│   ├── watchcharts_client.py  # Low-level WatchCharts API calls
-│   └── ebay.py             # eBay Browse API client
+│   ├── chrono24_scraper.py # Chrono24 Playwright scraper (primary data source)
+│   ├── watchcharts.py      # Wrapper that delegates to chrono24_scraper
+│   ├── watchcharts_client.py  # Legacy WatchCharts API (not used - $1000/yr)
+│   └── ebay.py             # eBay Browse API client (optional)
 ├── analytics/
 │   ├── metrics.py          # Heat score and momentum calculations
 │   └── profit.py           # Profit overlay calculations
@@ -129,18 +133,20 @@ The script generates two files in the `data/` directory:
 
 ## Notes
 
-- If your WatchCharts plan doesn't expose historical endpoints, the pipeline persists **daily snapshots** in `cache/`. Heat metrics improve after a few days of runs.
-- The script includes automatic retry logic (3 attempts with exponential backoff) for API calls.
+- The pipeline persists **daily snapshots** in `cache/`. Heat metrics become meaningful after 7-30 days of runs.
+- Chrono24 scraping takes ~15-20 seconds per watch due to Cloudflare protection and rate limiting.
+- The script includes automatic retry logic (3 attempts) for scraping.
 - All operations are logged to `watch_heat.log` for debugging.
 - Missing data is handled gracefully with appropriate warnings in logs.
+- DOM (days on market) data is not available from Chrono24 - this metric will show as blank.
 
 ## Recent Improvements
 
-- ✅ Added comprehensive logging and error handling
-- ✅ Implemented retry logic with exponential backoff for API calls
+- ✅ **Switched to Chrono24 scraping** - Free alternative to WatchCharts ($1000/yr saved!)
+- ✅ Playwright-based scraper with Cloudflare bypass
+- ✅ User agent rotation and fresh browser contexts
+- ✅ Comprehensive logging and error handling
+- ✅ Retry logic with delays for rate limiting
 - ✅ Enhanced HTML report with sorting, filtering, and modern UI
-- ✅ Added command-line arguments for flexibility
-- ✅ Improved metrics calculation with better edge case handling
-- ✅ Added data validation throughout the pipeline
-- ✅ Enhanced code documentation and type hints
-- ✅ Better handling of missing/invalid data
+- ✅ Command-line arguments for flexibility
+- ✅ Data validation throughout the pipeline
