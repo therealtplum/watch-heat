@@ -12,13 +12,13 @@ logger = logging.getLogger(__name__)
 def fetch_watchcharts_daily(brand_ref_pairs: Iterable[tuple[str, str]]) -> pd.DataFrame:
     """
     Fetch daily market data for given brand/reference pairs.
-    
+
     NOTE: This now uses Chrono24 scraper instead of WatchCharts API.
     The function name is kept for backwards compatibility with main.py.
-    
+
     Args:
         brand_ref_pairs: Iterable of (brand, reference) tuples
-        
+
     Returns:
         DataFrame with historical watch data
     """

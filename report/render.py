@@ -196,7 +196,7 @@ HTML_TMPL = """
       <h1>🔥 Watch Heat Report</h1>
       <div class="meta">Run Date: {{ run_date }} | Total Watches: {{ total_count }} | Hot Watches: {{ hot_count }}</div>
     </header>
-    
+
     <div class="stats">
       <div class="stat">
         <div class="stat-label">Total Watches</div>
@@ -215,13 +215,13 @@ HTML_TMPL = """
         <div class="stat-value">{{ max_heat }}</div>
       </div>
     </div>
-    
+
     <div class="controls">
       <input type="text" class="filter-input" id="searchInput" placeholder="Search by brand, reference, or name...">
       <button class="filter-toggle active" id="showAll">All</button>
       <button class="filter-toggle" id="showHot">Hot Only</button>
     </div>
-    
+
     <div class="table-wrapper">
       <table id="watchTable">
         <thead>
@@ -265,7 +265,7 @@ HTML_TMPL = """
       </table>
     </div>
   </div>
-  
+
   <script>
     const table = document.getElementById('watchTable');
     const tbody = table.querySelector('tbody');
@@ -275,37 +275,37 @@ HTML_TMPL = """
     let currentSort = { column: null, direction: 'asc' };
     let allRows = Array.from(tbody.querySelectorAll('tr'));
     let filteredRows = allRows;
-    
+
     // Search functionality
     function filterRows() {
       const query = searchInput.value.toLowerCase();
       const showHotOnly = showHot.classList.contains('active');
-      
+
       filteredRows = allRows.filter(row => {
         const text = row.textContent.toLowerCase();
         const matchesSearch = !query || text.includes(query);
         const matchesFilter = !showHotOnly || row.dataset.hot === 'true';
         return matchesSearch && matchesFilter;
       });
-      
+
       tbody.innerHTML = '';
       filteredRows.forEach(row => tbody.appendChild(row));
     }
-    
+
     searchInput.addEventListener('input', filterRows);
-    
+
     showAll.addEventListener('click', () => {
       showAll.classList.add('active');
       showHot.classList.remove('active');
       filterRows();
     });
-    
+
     showHot.addEventListener('click', () => {
       showHot.classList.add('active');
       showAll.classList.remove('active');
       filterRows();
     });
-    
+
     // Sorting functionality
     function parseValue(cell) {
       const text = cell.textContent.trim();
@@ -315,16 +315,16 @@ HTML_TMPL = """
       const num = parseFloat(cleaned);
       return isNaN(num) ? text : num;
     }
-    
+
     function sortTable(columnIndex) {
       const header = table.querySelectorAll('th')[columnIndex];
       const isNumeric = header.classList.contains('number');
-      
+
       // Remove sort indicators
       table.querySelectorAll('th').forEach(th => {
         th.classList.remove('sort-asc', 'sort-desc');
       });
-      
+
       // Determine sort direction
       if (currentSort.column === columnIndex) {
         currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -332,34 +332,34 @@ HTML_TMPL = """
         currentSort.column = columnIndex;
         currentSort.direction = 'asc';
       }
-      
+
       // Sort rows
       const rows = Array.from(tbody.querySelectorAll('tr'));
       rows.sort((a, b) => {
         const aVal = parseValue(a.cells[columnIndex]);
         const bVal = parseValue(b.cells[columnIndex]);
-        
+
         if (aVal === null && bVal === null) return 0;
         if (aVal === null) return 1;
         if (bVal === null) return -1;
-        
+
         let comparison = 0;
         if (isNumeric) {
           comparison = aVal - bVal;
         } else {
           comparison = String(aVal).localeCompare(String(bVal));
         }
-        
+
         return currentSort.direction === 'asc' ? comparison : -comparison;
       });
-      
+
       // Re-append sorted rows
       rows.forEach(row => tbody.appendChild(row));
-      
+
       // Add sort indicator
       header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
     }
-    
+
     // Add click handlers to headers
     table.querySelectorAll('th').forEach((th, index) => {
       th.addEventListener('click', () => sortTable(index));
@@ -371,7 +371,7 @@ HTML_TMPL = """
 
 def render_html(rows: List[Dict[str, Any]], out_path: Path, run_date: str) -> None:
     """Render HTML report from watch data.
-    
+
     Args:
         rows: List of dictionaries containing watch data
         out_path: Path to save HTML file
@@ -379,15 +379,15 @@ def render_html(rows: List[Dict[str, Any]], out_path: Path, run_date: str) -> No
     """
     if not rows:
         raise ValueError("No rows to render")
-    
+
     # Calculate statistics
     total_count = len(rows)
     hot_count = sum(1 for r in rows if r.get('is_hot'))
-    
+
     heat_values = [float(r.get('heat', 0)) for r in rows if r.get('heat') not in (None, '', '') and str(r.get('heat', '')).strip()]
     avg_heat = f"{sum(heat_values) / len(heat_values):.2f}" if heat_values else "0.00"
     max_heat = f"{max(heat_values):.2f}" if heat_values else "0.00"
-    
+
     html = Template(HTML_TMPL).render(
         rows=rows,
         run_date=run_date,
